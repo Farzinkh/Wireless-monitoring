@@ -5,5 +5,7 @@
 
 PROJECT_NAME := app-template
 
+EXTRA_COMPONENT_DIRS := $(IDF_LIB_PATH) #add for esp lib 
+
 include $(IDF_PATH)/make/project.mk
 
