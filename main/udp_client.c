@@ -24,7 +24,8 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 #include "addr_from_stdin.h"
-
+#include "driver/adc.h"
+#include "tostr.h"
 #if defined(CONFIG_EXAMPLE_IPV4)
 #define HOST_IP_ADDR CONFIG_EXAMPLE_IPV4_ADDR
 #elif defined(CONFIG_EXAMPLE_IPV6)
@@ -35,9 +36,8 @@
 
 #define PORT CONFIG_EXAMPLE_PORT
 
-static const char *TAG = "example";
-static const char *payload = "Message from ESP32 ";
-
+static const char *TAG = "UDP_Client";
+char buf[10];
 
 static void udp_client_task(void *pvParameters)
 {
@@ -76,13 +76,14 @@ static void udp_client_task(void *pvParameters)
         ESP_LOGI(TAG, "Socket created, sending to %s:%d", HOST_IP_ADDR, PORT);
 
         while (1) {
-
-            int err = sendto(sock, payload, strlen(payload), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+            ftoa(hall_sensor_read(), buf, 1);
+            int err = sendto(sock,&buf, 10, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
                 break;
             }
-            ESP_LOGI(TAG, "Message sent");
+            buf[10]='\0';
+            ESP_LOGI(TAG, "Message sent : %s",buf);
 
             struct sockaddr_storage source_addr; // Large enough for both IPv4 or IPv6
             socklen_t socklen = sizeof(source_addr);
