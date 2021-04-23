@@ -1,92 +1,50 @@
-import os
-import re
-import sys
-import socket,time
-from builtins import input
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 from matplotlib import style
-from threading import Event, Thread
-import matplotlib.animation as animation
-from __future__ import print_function, unicode_literals
+import socket,time
 
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 
+server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+server.settimeout(60.0)
+server.bind(('', 3333))
 
-# -----------  Config  ----------
-PORT = 3333
-INTERFACE = 'eth0'
-# -------------------------------
+fig = plt.gcf()
+plt.style.use('fivethirtyeight')
+plt.xticks(rotation=45, ha="right", rotation_mode="anchor") #rotate the x-axis values
+plt.subplots_adjust(bottom = 0.2, top = 0.9) #ensuring the dates (on the x-axis) fit in the screen
+plt.ylabel('Hall')
+plt.xlabel('Time')
+plt.title('Dynamic line graphs')
+t=time.time()
+x_values = []
+y_values = []
+counter = 0
 
+def data_gen(i):
+    global counter
+    try:
+        counter=1+counter
+        x_values.append(time.time()-t)
+        data, addr = server.recvfrom(1024)
+        if not data:
+            return
+        data = data.decode().replace("\x00",'')
+        Data=float(data)
+        y_values.append(Data)
+        print('Reply[' + addr[0] + ':' + str(addr[1]) + '] - ' + data)
+        reply = 'OK: ' + data
+        server.sendto(reply.encode(), addr)
+        if counter >100:
+            x_values.pop(0)
+            y_values.pop(0)
+            plt.cla()
+        plt.plot(x_values, y_values,color='r')    
+        time.sleep(0.25)    
+    except Exception as e:
+        print('Running server failed:{}'.format(e))
 
-
-style.use('fivethirtyeight')
-
-
-class UdpServer:
-
-    def __init__(self, port, family_addr, persist=False):
-        self.port = port
-        self.family_addr = family_addr
-        self.socket = socket.socket(family_addr, socket.SOCK_DGRAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.settimeout(60.0)
-        self.shutdown = Event()
-        self.persist = persist
-        self.fig=plt.figure()
-        self.ax1= self.fig.add_subplot(1,1,1)
-        self.time=time.time()
-        self.data=0
         
-    def __enter__(self):
-        try:
-            self.socket.bind(('', self.port))
-        except socket.error as e:
-            print('Bind failed:{}'.format(e))
-            raise
-
-        print('Starting server on port={} family_addr={}'.format(self.port, self.family_addr))
-        self.server_thread = Thread(target=self.run_server)
-        self.server_thread.start()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.persist:
-            sock = socket.socket(self.family_addr, socket.SOCK_DGRAM)
-            sock.sendto(b'Stop', ('localhost', self.port))
-            sock.close()
-            self.shutdown.set()
-        self.server_thread.join()
-        self.socket.close()
-
-    def run_server(self):
-        while not self.shutdown.is_set():
-            try:
-                data, addr = self.socket.recvfrom(1024)
-                if not data:
-                    return
-                self.data = data.decode()
-                ani = animation.FuncAnimation(self.fig, self.plot, interval=1000)
-                plt.show()
-                print('Reply[' + addr[0] + ':' + str(addr[1]) + '] - ' + self.data)
-                reply = 'OK: ' + self.data
-                self.socket.sendto(reply.encode(), addr)
-            except socket.error as e:
-                print('Running server failed:{}'.format(e))
-                raise
-            if not self.persist:
-                break
-    def plot(self):
-        xs = []
-        ys = []
-        xs.append(float(self.data))
-        ys.append(float(time.time()-self.time()))
-        self.ax1.clear()
-        self.ax1.plot(xs, ys)
-
-
-if __name__ == '__main__':
-    if sys.argv[1:] and sys.argv[1].startswith('IPv'):     # if additional arguments provided:
-        # Usage: example_test.py <IPv4|IPv6>
-        family_addr = socket.AF_INET6 if sys.argv[1] == 'IPv6' else socket.AF_INET
-        with UdpServer(PORT, family_addr, persist=True) as s:
-            print(input('Press Enter to stop the server...'))
-    else:
-        print("wrong parameter")
+ani = FuncAnimation(fig,data_gen,interval=100)
+plt.tight_layout()
+plt.show()
