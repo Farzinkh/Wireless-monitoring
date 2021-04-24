@@ -25,7 +25,6 @@
 #include <lwip/netdb.h>
 #include "addr_from_stdin.h"
 #include "driver/adc.h"
-#include "tostr.h"
 #if defined(CONFIG_EXAMPLE_IPV4)
 #define HOST_IP_ADDR CONFIG_EXAMPLE_IPV4_ADDR
 #elif defined(CONFIG_EXAMPLE_IPV6)
@@ -76,7 +75,7 @@ static void udp_client_task(void *pvParameters)
         ESP_LOGI(TAG, "Socket created, sending to %s:%d", HOST_IP_ADDR, PORT);
 
         while (1) {
-            ftoa(hall_sensor_read(), buf, 1);
+            sprintf( buf, "%d", hall_sensor_read()); 
             int err = sendto(sock,&buf, 10, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
