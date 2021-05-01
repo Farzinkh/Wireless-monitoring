@@ -8,7 +8,7 @@ The application creates UDP socket and sends message to the predefined port and 
 In order to start UDP server that communicates with UDP Client , choose one of the following options for just testing the communication you can run `example_test.py` and if you want to start monitoring run `python monitor.py` and push your ESP32 reset button you can cancel monitoring by just closeing monitor by pushing exit button.
 
 ### Screenshots
-![Screenshot for internal hall sensor](Screenshot.png?raw=true "Screenshot for internal hall sensor")
+![Screenshot for internal hall sensor](Screenshot .png?raw=true "Screenshot for internal hall sensor")
 
 ### About Python example_test
 Script example_test.py could be used as a counter part to the udp-client application, ip protocol name (IPv4 or IPv6) shall be stated as argument. Example:
