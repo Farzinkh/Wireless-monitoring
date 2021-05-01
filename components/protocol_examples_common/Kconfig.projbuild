@@ -10,13 +10,13 @@ menu "WIFI Configuration"
     if EXAMPLE_CONNECT_WIFI
         config EXAMPLE_WIFI_SSID
             string "WiFi SSID"
-            default "Anonymous"
+            default "ssid"
             help
                 SSID (network name) for the example to connect to.
 
         config EXAMPLE_WIFI_PASSWORD
             string "WiFi Password"
-            default "6339tktz6z"
+            default "password"
             help
                 WiFi password (WPA or WPA2) for the example to use.
                 Can be left blank if the network has no security set.

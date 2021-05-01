@@ -1,36 +1,16 @@
 
-# UDP Client example
+# ESP32 UDP Client & Real time Monitoring on server
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+The application creates UDP socket and sends message to the predefined port and IP address. After the server's reply, the application prints received reply as ASCII text, waits for 2 seconds and sends another message which can be ant int or float type data and finally you can see resault on monitoring graph for example in this project we will stream internal hall sensor readed values as long as we need.
 
-The application creates UDP socket and sends message to the predefined port and IP address. After the server's reply, the application prints received reply as ASCII text, waits for 2 seconds and sends another message.
+## How to use monitor
 
-## How to use example
+In order to start UDP server that communicates with UDP Client , choose one of the following options for just testing the communication you can run `example_test.py` and if you want to start monitoring run `python monitor.py` and push your ESP32 reset button you can cancel monitoring by just closeing monitor by pushing exit button.
 
-In order to create UDP server that communicates with UDP Client example, choose one of the following options.
+### Screenshots
+![Screenshot for internal hall sensor](Screenshot.png?raw=true "Screenshot for internal hall sensor")
 
-There are many host-side tools which can be used to interact with the UDP/TCP server/client. 
-One command line tool is [netcat](http://netcat.sourceforge.net) which can send and receive many kinds of packets. 
-Note: please replace `192.168.0.167 3333` with desired IPV4/IPV6 address (displayed in monitor console) and port number in the following commands.
-
-In addition to those tools, simple Python scripts can be found under sockets/scripts directory. Every script is designed to interact with one of the examples.
-
-### Send UDP packet via netcat
-```
-echo "Hello from PC" | nc -w1 -u 192.168.0.167 3333
-```
-
-### Receive UDP packet via netcat
-```
-echo "Hello from PC" | nc -w1 -u 192.168.0.167 3333
-```
-
-### UDP server using netcat
-```
-nc -u -l 192.168.0.167 3333
-```
-
-### Python scripts
+### About Python example_test
 Script example_test.py could be used as a counter part to the udp-client application, ip protocol name (IPv4 or IPv6) shall be stated as argument. Example:
 
 ```
@@ -42,7 +22,7 @@ please add `$IDF_PATH/tools/ci/python_packages` to `PYTHONPATH`.
 
 ## Hardware Required
 
-This example can be run on any commonly available ESP32 development board.
+This project can be run on any commonly available ESP32 development board.
 
 ## Configure the project
 
@@ -50,15 +30,15 @@ This example can be run on any commonly available ESP32 development board.
 idf.py menuconfig
 ```
 
-Set following parameters under Example Configuration Options:
+Set following parameters under project Configuration Options:
 
-* Set `IP version` of example to be IPV4 or IPV6.
+* Set `IP version` to be IPV4 or IPV6.
 
 * Set `IPV4 Address` in case your chose IP version IPV4 above.
 
 * Set `IPV6 Address` in case your chose IP version IPV6 above.
 
-* Set `Port` number that represents remote port the example will send data and receive data from.
+* Set `Port` number that represents remote port the client will send data and receive data from.
 
 Configure Wi-Fi or Ethernet under "Example Connection Configuration" menu. See "Establishing Wi-Fi or Ethernet Connection" section in [examples/protocols/README.md](../../README.md) for more details.
 

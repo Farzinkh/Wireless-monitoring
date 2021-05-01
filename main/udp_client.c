@@ -25,15 +25,15 @@
 #include <lwip/netdb.h>
 #include "addr_from_stdin.h"
 #include "driver/adc.h"
-#if defined(CONFIG_EXAMPLE_IPV4)
-#define HOST_IP_ADDR CONFIG_EXAMPLE_IPV4_ADDR
-#elif defined(CONFIG_EXAMPLE_IPV6)
-#define HOST_IP_ADDR CONFIG_EXAMPLE_IPV6_ADDR
+#if defined(CONFIG_IPV4)
+#define HOST_IP_ADDR CONFIG_IPV4_ADDR
+#elif defined(CONFIG_IPV6)
+#define HOST_IP_ADDR CONFIG_IPV6_ADDR
 #else
 #define HOST_IP_ADDR ""
 #endif
 
-#define PORT CONFIG_EXAMPLE_PORT
+#define PORT CONFIG_PORT
 
 static const char *TAG = "UDP_Client";
 char buf[10];
@@ -47,22 +47,22 @@ static void udp_client_task(void *pvParameters)
 
     while (1) {
 
-#if defined(CONFIG_EXAMPLE_IPV4)
+#if defined(CONFIG_IPV4)
         struct sockaddr_in dest_addr;
         dest_addr.sin_addr.s_addr = inet_addr(HOST_IP_ADDR);
         dest_addr.sin_family = AF_INET;
         dest_addr.sin_port = htons(PORT);
         addr_family = AF_INET;
         ip_protocol = IPPROTO_IP;
-#elif defined(CONFIG_EXAMPLE_IPV6)
+#elif defined(CONFIG_IPV6)
         struct sockaddr_in6 dest_addr = { 0 };
         inet6_aton(HOST_IP_ADDR, &dest_addr.sin6_addr);
         dest_addr.sin6_family = AF_INET6;
         dest_addr.sin6_port = htons(PORT);
-        dest_addr.sin6_scope_id = esp_netif_get_netif_impl_index(EXAMPLE_INTERFACE);
+        dest_addr.sin6_scope_id = esp_netif_get_netif_impl_index(INTERFACE);
         addr_family = AF_INET6;
         ip_protocol = IPPROTO_IPV6;
-#elif defined(CONFIG_EXAMPLE_SOCKET_IP_INPUT_STDIN)
+#elif defined(CONFIG_SOCKET_IP_INPUT_STDIN)
         struct sockaddr_storage dest_addr = { 0 };
         ESP_ERROR_CHECK(get_addr_from_stdin(PORT, SOCK_DGRAM, &ip_protocol, &addr_family, &dest_addr));
 #endif
