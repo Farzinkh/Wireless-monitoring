@@ -1,0 +1,5 @@
+{
+    "idf.flashType": "UART",
+    "idf.port": "/dev/ttyUSB0",
+    "python.pythonPath": "/home/farzin/apps/espressiftools/python_env/idf4.4_py3.9_env/bin/activate",
+}
