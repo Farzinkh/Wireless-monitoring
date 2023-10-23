@@ -17,14 +17,15 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
-#include "protocol_examples_common.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
-#include "addr_from_stdin.h"
 #include "driver/adc.h"
+
+#include "wifi.h"
+
 #if defined(CONFIG_IPV4)
 #define HOST_IP_ADDR CONFIG_IPV4_ADDR
 #elif defined(CONFIG_IPV6)
@@ -62,9 +63,6 @@ static void udp_client_task(void *pvParameters)
         dest_addr.sin6_scope_id = esp_netif_get_netif_impl_index(INTERFACE);
         addr_family = AF_INET6;
         ip_protocol = IPPROTO_IPV6;
-#elif defined(CONFIG_SOCKET_IP_INPUT_STDIN)
-        struct sockaddr_storage dest_addr = { 0 };
-        ESP_ERROR_CHECK(get_addr_from_stdin(PORT, SOCK_DGRAM, &ip_protocol, &addr_family, &dest_addr));
 #endif
 
         int sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
@@ -118,15 +116,6 @@ static void udp_client_task(void *pvParameters)
 
 void app_main(void)
 {
-    ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-    ESP_ERROR_CHECK(example_connect());
-
+    ESP_ERROR_CHECK(wifi_init_sta());
     xTaskCreate(udp_client_task, "udp_client", 4096, NULL, 5, NULL);
 }

@@ -1,5 +1,4 @@
-
-# ESP32 UDP Client & Real time Monitoring on server
+## ESP32 UDP Client & Real time Monitoring on server
 
 The application creates UDP socket and sends message to the predefined port and IP address. After the server's reply, the application prints received reply as ASCII text, waits for 2 seconds and sends another message which can be int or float type data and finally you can see resault on monitoring graph for example in this project we will stream internal hall sensor readed values as long as we need.
 
